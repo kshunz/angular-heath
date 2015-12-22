@@ -7,5 +7,9 @@
     "test": "gulp test"
   },
   "author": "K. Shunz",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-bower": "0.0.11"
+  }
 }

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Src App File</title>
+</head>
+<body>
+  <div ng-app="myApp" class="container">
+
+  </div>
+</body>
+<script src="lib/angular/angular.js"></script>
+<script src="ng-app.js"></script>
+<script>
+  angular.module('myApp', ['ngHeath'])
+  .run(function(_authService) {
+    _authService.login();
+  });
+</script>
+</html>
