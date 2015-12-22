@@ -1,0 +1,11 @@
+{
+  "name": "angular-heath",
+  "version": "1.0.0",
+  "description": "",
+  "main": "angular-heath.js",
+  "scripts": {
+    "test": "gulp test"
+  },
+  "author": "K. Shunz",
+  "license": "ISC"
+}
