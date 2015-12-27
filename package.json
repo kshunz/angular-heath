@@ -10,6 +10,11 @@
   "license": "ISC",
   "devDependencies": {
     "gulp": "^3.9.0",
-    "gulp-bower": "0.0.11"
+    "gulp-bower": "0.0.11",
+    "gulp-livereload": "^3.8.1",
+    "gulp-server-livereload": "^1.5.4",
+    "gulp-task-listing": "^1.0.1",
+    "gulp-util": "^3.0.7",
+    "st": "^1.1.0"
   }
 }
