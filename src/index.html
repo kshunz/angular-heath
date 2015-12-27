@@ -3,18 +3,91 @@
 <head>
 <meta charset="utf-8">
 <title>Src App File</title>
+
+<script src="lib/jquery/dist/jquery.js"></script>
+<link rel="stylesheet" type="text/css" href="lib/bootstrap/dist/css/bootstrap.css" />
+<link rel="stylesheet" type="text/css" href="lib/bootstrap/dist/css/bootstrap-theme.css" />
+
 </head>
 <body>
   <div ng-app="myApp" class="container">
+    <h1>App</h1>
+    <h4>{{ account }}
+      <a ng-href="/#/profile">Profile</a>
+      <a ng-href="/#/status">Status</a>
+    </h4>
+
+    <div ng-view="">
+      ...
+    </div>
 
   </div>
 </body>
+<script src="lib/bootstrap/dist/js/bootstrap.js"></script>
 <script src="lib/angular/angular.js"></script>
+<script src="lib/firebase/firebase.js"></script>
+<script src="lib/angularfire/dist/angularfire.js"></script>
+<script src="lib/angular-route/angular-route.js"></script>
 <script src="ng-app.js"></script>
 <script>
-  angular.module('myApp', ['ngHeath'])
-  .run(function(_authService) {
-    _authService.login();
-  });
+  angular.module('myApp', ['ngHeath', 'ngRoute'])
+    .config(function($routeProvider, $authProvider) {
+
+      $authProvider.init({
+        url: 'https://t6kdhxxz.firebaseio.com/',
+        failureRedirect: '/#/login'
+      });
+
+      var protect = $authProvider.protectPage;
+
+      $routeProvider
+
+        .when('/', {
+          template: 'Some template. {{ account }}'
+        })
+
+        .when('/login', {
+          template: '<h2>Login {{ user }}</h2><form ng-submit="login()"><input type="email" ng-model="user.username" /><input type="password" ng-model="user.password"  /><a ng-click="user.login()" class="btn btn-primary">Login</a></form>'
+        })
+
+        .when('/status', {
+          template: 'I am your status'
+        })
+
+        .when('/profile',
+          protect({
+            template: '<h2>Profile: {{ account }}</h2>'
+          })
+        )
+        // .otherwise({
+        //   redirectTo: '/'
+        // });
+
+    })
+    .run(function(_authService, $auth, $rootScope) {
+      // $rootScope.user.other = 'thing';
+
+      var auth = new $auth();
+
+      auth.use('password');
+
+      auth.userObject($rootScope, 'account');
+
+      auth.authObject($rootScope, 'user');
+
+
+      $rootScope.user.username = 'dwayne@bl.io';
+      $rootScope.user.password = 'hello';
+
+      $rootScope.$on('$routeChangeSuccess', function(o, t, h) {
+        console.warn('one', o, 'two', t, 'three', h);
+      });
+      
+      // auth.login('dwayne@bl.io', 'helloz');
+
+    })
+
+
+
 </script>
 </html>
