@@ -1,10 +1,19 @@
-var gulp = require('gulp');
-var bower = require('gulp-bower');
+global.gulp = require('gulp');
+global.gutil = require('gulp-util');
+var taskListing = require('gulp-task-listing');
+var fs = require('fs');
 
-gulp.task('bower', function() {
-  return bower()
-    .pipe(gulp.dest('./src/lib'));
+var files = fs.readdirSync('./tasks');
+
+global.log = global.gutil.log;
+global.c = global.gutil.colors;
+
+files.forEach(function (file) {
+  if(file !== 'plugins') {
+    require('./tasks' + '/' + file);
+  }
 });
 
+gulp.task('help', taskListing);
 
-gulp.task('default', ['bower']);
+gulp.task('default', ['help']);
