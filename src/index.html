@@ -43,11 +43,17 @@
       $routeProvider
 
         .when('/', {
-          template: 'Some template. {{ account }}'
+          template: 'Some template. {{ user }}'
         })
 
         .when('/login', {
-          template: '<h2>Login {{ user }}</h2><form ng-submit="login()"><input type="email" ng-model="user.username" /><input type="password" ng-model="user.password"  /><a ng-click="user.login()" class="btn btn-primary">Login</a></form>'
+          template:
+          '<h2>Login</h2>' +
+          '<form ng-submit="auth.login()">' +
+          '<input type="email" ng-model="auth.username" />' +
+          '<input type="password" ng-model="auth.password"  />' +
+          '<a ng-click="auth.login()" class="btn btn-primary">Login</a>' +
+          '</form>'
         })
 
         .when('/status', {
@@ -56,36 +62,33 @@
 
         .when('/profile',
           protect({
-            template: '<h2>Profile: {{ account }}</h2>'
+            template: '<h4>Account: {{ account }}</h4>' +
+            '<h4>User: {{ user }}</h4>' +
+            '<h4>Auth: {{ auth }}</h4>'
           })
         )
-        // .otherwise({
-        //   redirectTo: '/'
-        // });
+        .otherwise({
+          redirectTo: '/'
+        });
 
     })
-    .run(function(_authService, $auth, $rootScope) {
-      // $rootScope.user.other = 'thing';
+    .run(function($auth, $rootScope) {
 
       var auth = new $auth();
 
-      auth.use('password');
+      // auth.use('twitter');
 
-      auth.userObject($rootScope, 'account');
+      auth.userObject($rootScope, 'user');
+      auth.authObject($rootScope, 'auth');
 
-      auth.authObject($rootScope, 'user');
+      // $rootScope.$on('$routeChangeSuccess', function(o, t, h) {
+      //   console.warn('one', o, 'two', t, 'three', h);
+      // });
 
+      // $rootScope.account.username = 'test@bl.io';
+      // $rootScope.account.password = 'test';
 
-      $rootScope.user.username = 'dwayne@bl.io';
-      $rootScope.user.password = 'hello';
-
-      $rootScope.$on('$routeChangeSuccess', function(o, t, h) {
-        console.warn('one', o, 'two', t, 'three', h);
-      });
-      
-      // auth.login('dwayne@bl.io', 'helloz');
-
-    })
+    });
 
 
 

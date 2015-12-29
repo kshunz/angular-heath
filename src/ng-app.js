@@ -6,123 +6,6 @@ angular.module('ngHeath', ['firebase'])
   }
 })
 
-/*
-
-.factory('_Auth', function($q) {
-
-  return function(firebaseUrl) {
-    var _this = this;
-
-    this.name = '_Auth';
-
-    if(!firebaseUrl) {
-      return console.error('A Firebase app URL is required to use this utility.', this.name);
-    }
-
-    var ref = new Firebase(firebaseUrl);
-
-    this._scope = {};
-    this._scopeKey = 'user';
-    this.userObjectActive = false;
-    this.strategy = 'password';
-
-    this.strategies = {
-      'password': true,
-      'twitter': true,
-      'google': true
-    };
-
-    this.use = function(strategy) {
-      this.strategy = strategy;
-    };
-
-    this.userObject = function(_scope, _scopeKey) {
-      if(_scope && _scopeKey) {
-        this._scope = _scope;
-        this._scopeKey = _scopeKey;
-        this.userObjectActive = true;
-      }
-    };
-
-    this.register = function(email, password) {
-
-      if(validate(email, 'email')) {
-        var errorMessage = 'Please provide a valid email address.';
-
-        return console.error(errorMessage);
-      }
-
-      ref.createUser({ email: username, password: password },
-        function(error, userData) {
-
-          if (error) {
-            console.log("Error creating user:", error);
-          } else {
-            console.log("Successfully created user account with uid:", userData.uid);
-          }
-
-      });
-    };
-
-    this.login = function(strategy, password) {
-      var username = angular.copy(strategy);
-      var strategyExists;
-      var passwordNeeded;
-
-      if(!password) {
-        this.strategy = strategy || this.strategy;
-        this.strategy = String(strategy).toLowerCase();
-      }
-
-      strategyExists = this.strategies[this.strategy];
-      passwordNeeded = !strategyExists && !password;
-
-      if(passwordNeeded) {
-        console.error('If you are attempting to login with email and password please provide a password.');
-        return console.warn('You may also get this error if you entered an invalid authentication strategy.');
-      }
-
-      console.log('login with', strategyExists, username, this.strategy);
-
-      if(this.strategy === 'password') {
-        var authMessage = 'Login failed.';
-
-        ref.authWithPassword({ email: username, password: password },
-          function(err, user) {
-
-            authMessage = (!err && user) ?
-              'Logged in as ' + user.auth.uid : authMessage + ' ' + err;
-
-            if(_this.userObjectActive) {
-              _this._scope[_this._scopeKey] = user.auth;
-              _this._scope.$apply();
-            }
-
-        });
-      }
-
-
-    };
-
-    this.protectPage = function(config) {
-      return config.resolve = function($q) {
-        return $q(function(resolve, reject) {
-
-          if(ref.getAuth()) {
-            resolve();
-          } else {
-            reject();
-          }
-
-        });
-      };
-    };
-  };
-
-})
-
-*/
-
 .provider('$auth', function() {
 
   var $this = this;
@@ -207,12 +90,15 @@ angular.module('ngHeath', ['firebase'])
       var _this = this;
 
       this.ref = $this.ref;
-      this.name = '$auth';
       this._scope = {};
-      this._scopeKey = 'user';
+
+      this.name = '$auth';
+      // this._scopeUserKey = 'user';
+      // this._scopeAuthKey = 'account';
+      this.strategy = 'password';
+
       this.authObjectActive = false;
       this.userObjectActive = false;
-      this.strategy = 'password';
 
       this.strategies = {
         'password': true,
@@ -220,13 +106,16 @@ angular.module('ngHeath', ['firebase'])
         'google': true
       };
 
-      this.authObject = function(_scope, _scopeKey) {
-        this.authObjectActive = true;
-        if(_scope && _scopeKey) {
-          this._scope = _scope;
-          this._scopeKey = _scopeKey;
+      this.authObject = function(scope, scopeKey) {
 
-          var keyExistsInScope = this._scope.hasOwnProperty(this._scopeKey);
+        this.authObjectActive = true;
+
+        if(scope && scopeKey) {
+
+          this._authScope = scope;
+          this._authKey = scopeKey;
+
+          var keyExistsInScope = this._authScope.hasOwnProperty(this._authKey);
           var authObj = {};
 
           authObj.login = this.login;
@@ -234,37 +123,36 @@ angular.module('ngHeath', ['firebase'])
           // authObj.logout = this.logout;
           // authObj.isLoggedIn = this.isLoggedIn;
 
-          if(keyExistsInScope && typeof this._scope[this._scopeKey] === 'object') {
+          if(keyExistsInScope && typeof this._authScope[this._authKey] === 'object') {
             //extend object if present
             Object.keys(authObj).forEach(function(name) {
               console.warn('extend', name);
-              _this._scope[_this._scopeKey][name] = authObj[name];
+              _this._authScope[_this._authKey][name] = authObj[name];
             });
           }
 
-          if(keyExistsInScope && typeof this._scope[this._scopeKey] !== 'object') {
-            console.error('The chosen key (%s) is already in use.', this._scopeKey);
+          if(keyExistsInScope && typeof this._authScope[this._authKey] !== 'object') {
+            console.error('The chosen key (%s) is already in use.', this._authKey);
           }
 
           if(!keyExistsInScope) {
-            console.warn('Setting new scope key', _scopeKey);
-            this._scope[this._scopeKey] = authObj;
+            console.warn('Setting new scope key', scopeKey);
+            this._authScope[this._authKey] = authObj;
           }
-          // this._scope[this._scopeKey] = authObj;
-          // this._scope.$apply();
 
         }
       };
 
       this.use = function(strategy) {
-        this.strategy = strategy;
+        _this.strategy = strategy;
       };
 
-      this.userObject = function(_scope, _scopeKey) {
-        if(_scope && _scopeKey) {
-          this._scope = _scope;
-          this._scopeKey = _scopeKey;
-          this.userObjectActive = true;
+      this.userObject = function(scope, scopeKey) {
+        if(scope && scopeKey) {
+          this._userScope = scope;
+          this._userKey = scopeKey;
+          this.userObjectActive = true
+          this._userScope.$apply();
         }
       };
 
@@ -288,55 +176,91 @@ angular.module('ngHeath', ['firebase'])
         });
 
       };
+      //
+      // this.login = function(strategy, password) {
+      //   // alert('logging in with ' + strategy + ' ' + password);
+      //   var username = angular.copy(strategy);
+      //   var strategyExists;
+      //   var passwordNeeded;
+      //
+      //   this.strategies = _this.strategies;
+      //
+      //   if(_this.authObjectActive) {
+      //     console.warn('authObject in use!');
+      //     var scope = _this._scope[_this._scopeKey];
+      //     // username = scope.username ? scope.username : username;
+      //     password = scope.password || password;
+      //   }
+      //
+      //   if(!password) {
+      //     console.error('No password provided');
+      //     this.strategy = strategy || this.strategy;
+      //     this.strategy = String(strategy).toLowerCase();
+      //   }
+      //
+      //   strategyExists = this.strategies[this.strategy];
+      //   passwordNeeded = !strategyExists && !password;
+      //
+      //   if(passwordNeeded) {
+      //     console.error('If you are attempting to login with email and password please provide a password.');
+      //     return console.warn('You may also get this error if you entered an invalid authentication strategy.');
+      //   }
+      //
+      //   if(this.strategy === 'password') {
+      //     var authMessage = 'Login failed.';
+      //
+      //     this.ref.authWithPassword({ email: username, password: password },
+      //       function(err, user) {
+      //
+      //         authMessage = (!err && user) ?
+      //           'Logged in as ' + user.auth.uid : authMessage + ' ' + err;
+      //
+      //         if(_this.userObjectActive) {
+      //           _this._scope[_this._scopeKey] = user.auth;
+      //           _this._scope.$apply();
+      //         }
+      //
+      //     });
+      //   }
+      //
+      //
+      // };
+      //
+      //
 
-      this.login = function(strategy, password) {
-        // alert('logging in with ' + strategy + ' ' + password);
+      this.login = function() {
 
+        var scopeAuthObj = _this._authScope[ _this._authKey ];
+        var scopeUserObj = _this._userScope[ _this._userKey ];
+        var scopeObj = scopeAuthObj;
+        var username;
+        var password;
 
-        var username = angular.copy(strategy);
-        var strategyExists;
-        var passwordNeeded;
+        if(_this.strategy === 'password') {
+          username = scopeObj.username;
+          password = scopeObj.password;
 
-        if(_this.authObjectActive) {
-          var scope = _this._scope[_this._scopeKey];
-          scope.username = '';
-          scope.password = '';
-
-
-          // console.warn(scope.username, scope.password);
-          console.warn(_this._scope[_this._scopeKey]);
-        }
-
-        if(!password) {
-          this.strategy = strategy || this.strategy;
-          this.strategy = String(strategy).toLowerCase();
-        }
-
-        strategyExists = this.strategies[this.strategy];
-        passwordNeeded = !strategyExists && !password;
-
-        if(passwordNeeded) {
-          console.error('If you are attempting to login with email and password please provide a password.');
-          return console.warn('You may also get this error if you entered an invalid authentication strategy.');
-        }
-
-        console.log('login with', strategyExists, username, this.strategy);
-
-        if(this.strategy === 'password') {
+          //login with fb
           var authMessage = 'Login failed.';
 
-          this.ref.authWithPassword({ email: username, password: password },
+          _this.ref.authWithPassword({ email: username, password: password },
             function(err, user) {
+              if(!err && user) {
 
-              authMessage = (!err && user) ?
-                'Logged in as ' + user.auth.uid : authMessage + ' ' + err;
+                authMessage = (!err && user) ? 'Logged in as ' + user.auth.uid : authMessage + ' ' + err;
 
-              if(_this.userObjectActive) {
-                _this._scope[_this._scopeKey] = user.auth;
-                _this._scope.$apply();
+                if(_this.userObjectActive) {
+                  scopeUserObject = user.auth;
+                  _this._authScope.$apply();
+                  console.warn('Login successful', user.auth);
+                }
+
+              } else {
+                console.error('Login failure', err, username, password);
               }
 
           });
+
         }
 
 
@@ -344,30 +268,8 @@ angular.module('ngHeath', ['firebase'])
 
       this.protectPage = $this.protectPage;
 
-
     };
 
   };
 
-})
-
-.service('_authService', function() {
-
-  //powered by firebase
-  this.login = function() {
-    console.log('authSvc Method', 'login');
-  };
-
-  this.logout = function() {
-    console.log('authSvc Method', 'logout');
-  };
-
-  this.isLoggedIn = function() {
-    console.log('authSvc Method', 'isLoggedIn');
-  };
-
-  this.protectPage = function() {
-    console.log('authSvc Method', 'protectPage');
-  };
-
-})
+});
