@@ -12,7 +12,7 @@
 <body>
   <div ng-app="myApp" class="container">
     <h1>App</h1>
-    <h4>{{ account }}
+    <h4>
       <a ng-href="/#/profile">Profile</a>
       <a ng-href="/#/status">Status</a>
     </h4>
@@ -56,8 +56,13 @@
           '</form>'
         })
 
-        .when('/status', {
-          template: 'I am your status'
+        .when('/status', protect({
+          template: 'I am your status',
+          failureRedirect: '/#/cnn'
+        }))
+
+        .when('/cnn', {
+          template: 'This is CNN'
         })
 
         .when('/profile',
@@ -76,17 +81,8 @@
 
       var auth = new $auth();
 
-      // auth.use('twitter');
-
       auth.userObject($rootScope, 'user');
       auth.authObject($rootScope, 'auth');
-
-      // $rootScope.$on('$routeChangeSuccess', function(o, t, h) {
-      //   console.warn('one', o, 'two', t, 'three', h);
-      // });
-
-      // $rootScope.account.username = 'test@bl.io';
-      // $rootScope.account.password = 'test';
 
     });
 

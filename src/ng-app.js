@@ -156,7 +156,7 @@ angular.module('ngHeath', ['firebase'])
         }
       };
 
-      this.register = function(email, password) {
+      this.register = function(email, password, cb) {
 
         if(validate(email, 'email')) {
           var errorMessage = 'Please provide a valid email address.';
@@ -169,8 +169,10 @@ angular.module('ngHeath', ['firebase'])
 
             if (error) {
               console.log("Error creating user:", error);
+              cb("Error creating user: " + error, userData);
             } else {
               console.log("Successfully created user account with uid:", userData.uid);
+              cb(null, userData);
             }
 
         });
@@ -228,15 +230,14 @@ angular.module('ngHeath', ['firebase'])
       //
       //
 
-      this.login = function() {
+      this.login = function(strategy, password) {
 
         var scopeAuthObj = _this._authScope[ _this._authKey ];
         var scopeUserObj = _this._userScope[ _this._userKey ];
         var scopeObj = scopeAuthObj;
         var username;
-        var password;
 
-        if(_this.strategy === 'password') {
+        if(_this.strategy === 'password' || strategy && password) {
           username = scopeObj.username;
           password = scopeObj.password;
 
