@@ -1,8 +1,8 @@
 {
   "name": "angular-heath",
   "description": "Utils and modules for repetitive mobile web app development",
-  "main": "angular-heath.js",
-  "version": "1.1.0",
+  "main": "dist/angular-heath.js",
+  "version": "1.1.1",
   "authors": [
     "K. Shunz"
   ],

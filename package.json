@@ -1,8 +1,8 @@
 {
   "name": "angular-heath",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Utils and modules for repetitive mobile web app development",
-  "main": "angular-heath.js",
+  "main": "dist/angular-heath.js",
   "scripts": {
     "test": "gulp test"
   },
