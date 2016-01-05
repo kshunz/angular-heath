@@ -1,10 +1,5 @@
 angular.module('ngHeath', ['firebase', 'mgcrea.ngStrap'])
 
-/*Contents
-* AngularStrap (bootstrap directives)
-* Angularfire
-*/
-
 .run(function() {
   if(!window.Firebase) {
     return console.error('Firebase is required. Please install Firebase before using this utility.', this.name);

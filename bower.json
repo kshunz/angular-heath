@@ -2,7 +2,7 @@
   "name": "angular-heath",
   "description": "Utils and modules for repetitive mobile web app development",
   "main": "dist/angular-heath.js",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "authors": [
     "K. Shunz"
   ],
