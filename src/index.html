@@ -11,15 +11,107 @@
 </head>
 <body>
   <div ng-app="myApp" class="container">
-    <h1>App</h1>
+    <!-- <h1>App</h1>
     <h4>
       <a ng-href="/#/profile">Profile</a>
       <a ng-href="/#/status">Status</a>
-    </h4>
-
+    </h4> -->
     <div ng-view="">
       ...
     </div>
+
+    <script type="text/ng-template" id="/nav.html">
+      <!--nav class="navbar navbar-default" role="navigation" bs-navbar>
+        <div class="navbar-header">
+          <a class="navbar-brand" ng-href="#/">
+          <strong>Application</strong>
+          </a>
+        </div>
+      </nav-->
+
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <!-- Brand and toggle get grouped for better mobile display -->
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">
+              <strong>APPLICATION</strong>
+            </a>
+          </div>
+
+          <!-- Collect the nav links, forms, and other content for toggling -->
+          <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+              <li><a href="#/red">Red</a></li>
+              <li><a href="#/blue">Blue</a></li>
+              <li><a href="#/green">Green</a></li>
+              <li><a href="#/yellow">Yellow</a></li>
+            </ul>
+          </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
+      </nav>
+
+
+
+    </script>
+
+    <script type="text/ng-template" id="/home.html">
+      <span ng-include="'/nav.html'"></span>
+      <style>
+      .page {
+        border: solid thin black;
+        height: 500px;
+        margin-bottom: 10px;
+        color: white;
+        padding: 15px 30px;
+      }
+      .red { background: red }
+      .blue { background: blue }
+      .green { background: green }
+      .yellow { background: yellow; color: black; }
+      .buffer { margin-bottom: 1000px }
+      </style>
+      <h2>Home</h2>
+      <div data-target="#red" bs-scrollspy class="page red"><h1>Red</h1></div>
+      <div data-target="#blue" bs-scrollspy class="page blue"><h1>Blue</h1></div>
+      <div data-target="#green" bs-scrollspy class="page green"><h1>Green</h1></div>
+      <div data-target="#yellow" bs-scrollspy class="page yellow"><h1>Yellow</h1></div>
+      <div class="buffer"></div>
+    </script>
+
+    <script type="text/ng-template" id="/signin.html">
+      <div class="container">
+        <form class="form-signin" ng-submit="auth.login()">
+          <h2 class="form-signin-heading">Please log in</h2>
+          <label for="inputEmail" class="sr-only">Email address</label>
+          <input ng-model="auth.username" type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+          <label for="inputPassword" class="sr-only">Password</label>
+          <input ng-model="auth.password" type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" value="remember-me"> Remember me
+            </label>
+          </div>
+          <button class="btn btn-lg btn-primary btn-block"
+          type="submit" ng-submit="auth.login()">Sign in
+          </button>
+        </form>
+      </div>
+    </script>
+
+    <script type="text/ng-template" id="/login.html">
+      <h2>Login</h2>
+      <form ng-submit="auth.login()">
+        <input type="email" ng-model="auth.username" />
+        <input type="password" ng-model="auth.password"  />
+        <a ng-click="auth.login()" class="btn btn-primary">Login</a>
+      </form>
+    </script>
 
   </div>
 </body>
@@ -28,9 +120,12 @@
 <script src="lib/firebase/firebase.js"></script>
 <script src="lib/angularfire/dist/angularfire.js"></script>
 <script src="lib/angular-route/angular-route.js"></script>
+<script src="lib/angular-strap/dist/angular-strap.js"></script>
 <script src="ng-app.js"></script>
+
 <script>
   angular.module('myApp', ['ngHeath', 'ngRoute'])
+
     .config(function($routeProvider, $authProvider) {
 
       $authProvider.init({
@@ -43,50 +138,37 @@
       $routeProvider
 
         .when('/', {
-          template: 'Some template. {{ user }}'
+          templateUrl: '/home.html'
         })
-
         .when('/login', {
-          template:
-          '<h2>Login</h2>' +
-          '<form ng-submit="auth.login()">' +
-          '<input type="email" ng-model="auth.username" />' +
-          '<input type="password" ng-model="auth.password"  />' +
-          '<a ng-click="auth.login()" class="btn btn-primary">Login</a>' +
-          '</form>'
+          templateUrl: '/signin.html'
         })
-
         .when('/status', protect({
-          template: 'I am your status',
-          failureRedirect: '/#/cnn'
+          template: 'I am your status'
         }))
-
         .when('/cnn', {
           template: 'This is CNN'
         })
-
         .when('/profile',
           protect({
             template: '<h4>Account: {{ account }}</h4>' +
             '<h4>User: {{ user }}</h4>' +
             '<h4>Auth: {{ auth }}</h4>'
           })
-        )
-        .otherwise({
-          redirectTo: '/'
-        });
-
+        );
+        // .otherwise({
+        //   redirectTo: '/'
+        // });
     })
     .run(function($auth, $rootScope) {
 
       var auth = new $auth();
 
       auth.userObject($rootScope, 'user');
+
       auth.authObject($rootScope, 'auth');
 
     });
-
-
 
 </script>
 </html>

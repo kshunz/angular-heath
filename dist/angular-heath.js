@@ -1,4 +1,9 @@
-angular.module('ngHeath', ['firebase'])
+angular.module('ngHeath', ['firebase', 'mgcrea.ngStrap'])
+
+/*Contents
+* AngularStrap (bootstrap directives)
+* Angularfire
+*/
 
 .run(function() {
   if(!window.Firebase) {
