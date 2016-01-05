@@ -154,7 +154,6 @@ angular.module('ngHeath', ['firebase', 'mgcrea.ngStrap'])
           this._userScope = scope;
           this._userKey = scopeKey;
           this.userObjectActive = true
-          this._userScope.$apply();
         }
       };
 
