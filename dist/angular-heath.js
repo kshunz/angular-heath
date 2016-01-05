@@ -38,17 +38,6 @@ angular.module('ngHeath', ['firebase', 'mgcrea.ngStrap'])
           var localRedirect = config.failureRedirect;
           var globalRedirect = options.failureRedirect;
 
-          if(localRedirect) {
-            console.log(localRedirect.split('#'));
-          }
-
-          if(globalRedirect) {
-            console.log(globalRedirect.split('#'));
-          }
-
-          console.log('localRedirect', localRedirect);
-          console.log('globalRedirect', globalRedirect);
-
           if(userData) {
             console.log('User is logged in:', userData);
             resolve();
@@ -83,7 +72,7 @@ angular.module('ngHeath', ['firebase', 'mgcrea.ngStrap'])
     return config;
   };
 
-  this.$get = function() {
+  this.$get = function($window) {
 
     return function() {
 
@@ -106,6 +95,19 @@ angular.module('ngHeath', ['firebase', 'mgcrea.ngStrap'])
         'google': true
       };
 
+      _this.loginRedirectUrl = '/';
+      _this.logoutRedirectUrl = '/';
+
+      _this.loginRedirect = function(url) {
+        _this.loginRedirectUrl = url;
+        console.log('Login redirect to', url);
+      };
+
+      _this.logoutRedirect = function(url) {
+        _this.logoutRedirectUrl = url;
+        console.log('Logout redirect to', url);
+      };
+
       this.authObject = function(scope, scopeKey) {
 
         this.authObjectActive = true;
@@ -120,8 +122,8 @@ angular.module('ngHeath', ['firebase', 'mgcrea.ngStrap'])
 
           authObj.login = this.login;
           authObj.register = this.register;
-          // authObj.logout = this.logout;
-          // authObj.isLoggedIn = this.isLoggedIn;
+          authObj.logout = this.logout;
+          authObj.isLoggedIn = this.isLoggedIn;
 
           if(keyExistsInScope && typeof this._authScope[this._authKey] === 'object') {
             //extend object if present
@@ -178,62 +180,20 @@ angular.module('ngHeath', ['firebase', 'mgcrea.ngStrap'])
         });
 
       };
-      //
-      // this.login = function(strategy, password) {
-      //   // alert('logging in with ' + strategy + ' ' + password);
-      //   var username = angular.copy(strategy);
-      //   var strategyExists;
-      //   var passwordNeeded;
-      //
-      //   this.strategies = _this.strategies;
-      //
-      //   if(_this.authObjectActive) {
-      //     console.warn('authObject in use!');
-      //     var scope = _this._scope[_this._scopeKey];
-      //     // username = scope.username ? scope.username : username;
-      //     password = scope.password || password;
-      //   }
-      //
-      //   if(!password) {
-      //     console.error('No password provided');
-      //     this.strategy = strategy || this.strategy;
-      //     this.strategy = String(strategy).toLowerCase();
-      //   }
-      //
-      //   strategyExists = this.strategies[this.strategy];
-      //   passwordNeeded = !strategyExists && !password;
-      //
-      //   if(passwordNeeded) {
-      //     console.error('If you are attempting to login with email and password please provide a password.');
-      //     return console.warn('You may also get this error if you entered an invalid authentication strategy.');
-      //   }
-      //
-      //   if(this.strategy === 'password') {
-      //     var authMessage = 'Login failed.';
-      //
-      //     this.ref.authWithPassword({ email: username, password: password },
-      //       function(err, user) {
-      //
-      //         authMessage = (!err && user) ?
-      //           'Logged in as ' + user.auth.uid : authMessage + ' ' + err;
-      //
-      //         if(_this.userObjectActive) {
-      //           _this._scope[_this._scopeKey] = user.auth;
-      //           _this._scope.$apply();
-      //         }
-      //
-      //     });
-      //   }
-      //
-      //
-      // };
-      //
-      //
+
+      this.isLoggedIn = function() {
+        return _this.ref.getAuth() ? true : false;
+      };
+
+      this.logout = function() {
+        this.ref.unauth();
+        $window.location = _this.logoutRedirectUrl;
+      };
 
       this.login = function(strategy, password) {
 
         var scopeAuthObj = _this._authScope[ _this._authKey ];
-        var scopeUserObj = _this._userScope[ _this._userKey ];
+        var scopeUserObj = _this._userKey ? _this._userScope[ _this._userKey ] : {};
         var scopeObj = scopeAuthObj;
         var username;
 
@@ -254,6 +214,7 @@ angular.module('ngHeath', ['firebase', 'mgcrea.ngStrap'])
                   scopeUserObject = user.auth;
                   _this._authScope.$apply();
                   console.warn('Login successful', user.auth);
+                  $window.location = _this.loginRedirectUrl;
                 }
 
               } else {
