@@ -185,7 +185,7 @@ angular.module('ngHeath', ['firebase', 'mgcrea.ngStrap'])
       };
 
       this.logout = function() {
-        this.ref.unauth();
+        _this.ref.unauth();
         $window.location = _this.logoutRedirectUrl;
       };
 
