@@ -38,17 +38,6 @@ angular.module('ngHeath', ['firebase', 'mgcrea.ngStrap'])
           var localRedirect = config.failureRedirect;
           var globalRedirect = options.failureRedirect;
 
-          if(localRedirect) {
-            console.log(localRedirect.split('#'));
-          }
-
-          if(globalRedirect) {
-            console.log(globalRedirect.split('#'));
-          }
-
-          console.log('localRedirect', localRedirect);
-          console.log('globalRedirect', globalRedirect);
-
           if(userData) {
             console.log('User is logged in:', userData);
             resolve();
@@ -83,7 +72,7 @@ angular.module('ngHeath', ['firebase', 'mgcrea.ngStrap'])
     return config;
   };
 
-  this.$get = function() {
+  this.$get = function($window) {
 
     return function() {
 
@@ -104,6 +93,13 @@ angular.module('ngHeath', ['firebase', 'mgcrea.ngStrap'])
         'password': true,
         'twitter': true,
         'google': true
+      };
+
+      _this.loginRedirectUrl = '/';
+
+      _this.loginRedirect = function(url) {
+        _this.loginRedirectUrl = url;
+        console.log('Login redirect to', url);
       };
 
       this.authObject = function(scope, scopeKey) {
@@ -178,6 +174,8 @@ angular.module('ngHeath', ['firebase', 'mgcrea.ngStrap'])
         });
 
       };
+
+
       //
       // this.login = function(strategy, password) {
       //   // alert('logging in with ' + strategy + ' ' + password);
@@ -233,7 +231,7 @@ angular.module('ngHeath', ['firebase', 'mgcrea.ngStrap'])
       this.login = function(strategy, password) {
 
         var scopeAuthObj = _this._authScope[ _this._authKey ];
-        var scopeUserObj = _this._userScope[ _this._userKey ];
+        var scopeUserObj = _this._userKey ? _this._userScope[ _this._userKey ] : {};
         var scopeObj = scopeAuthObj;
         var username;
 
@@ -254,6 +252,7 @@ angular.module('ngHeath', ['firebase', 'mgcrea.ngStrap'])
                   scopeUserObject = user.auth;
                   _this._authScope.$apply();
                   console.warn('Login successful', user.auth);
+                  $window.location = _this.loginRedirectUrl;
                 }
 
               } else {
