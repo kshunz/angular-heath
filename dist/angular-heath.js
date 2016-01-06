@@ -82,8 +82,8 @@ angular.module('ngHeath', ['firebase', 'mgcrea.ngStrap'])
       this._scope = {};
 
       this.name = '$auth';
-      // this._scopeUserKey = 'user';
-      // this._scopeAuthKey = 'account';
+      this._scopeUserKey = 'user';
+      this._scopeAuthKey = 'auth';
       this.strategy = 'password';
 
       this.authObjectActive = false;
@@ -128,7 +128,6 @@ angular.module('ngHeath', ['firebase', 'mgcrea.ngStrap'])
           if(keyExistsInScope && typeof this._authScope[this._authKey] === 'object') {
             //extend object if present
             Object.keys(authObj).forEach(function(name) {
-              console.warn('extend', name);
               _this._authScope[_this._authKey][name] = authObj[name];
             });
           }
@@ -149,13 +148,24 @@ angular.module('ngHeath', ['firebase', 'mgcrea.ngStrap'])
         _this.strategy = strategy;
       };
 
+      this.getRef = function() {
+        return _this.ref;
+      };
+
+      this.user = function() {
+        return _this.ref.getAuth();
+      };
+
       this.userObject = function(scope, scopeKey) {
         if(scope && scopeKey) {
+          var userData = this.user();
+
           this._userScope = scope;
           this._userKey = scopeKey;
           this.userObjectActive = true
         }
       };
+
 
       this.register = function(email, password, cb) {
 

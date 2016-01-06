@@ -1,6 +1,6 @@
 {
   "name": "angular-heath",
-  "version": "1.5.1",
+  "version": "1.6.0",
   "description": "Utils and modules for repetitive mobile web app development",
   "main": "dist/angular-heath.js",
   "authors": [

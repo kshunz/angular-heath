@@ -168,6 +168,8 @@
 
       auth.authObject($rootScope, 'auth');
 
+      $rootScope.user = auth.user();
+
       auth.loginRedirect('/#/profile');
 
     });
