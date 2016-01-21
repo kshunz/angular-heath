@@ -1,5 +1,7 @@
 angular.module('ngHeath', ['firebase', 'mgcrea.ngStrap'])
 
+.constant('version', '1.6.0')
+
 .run(function() {
   if(!window.Firebase) {
     return console.error('Firebase is required. Please install Firebase before using this utility.', this.name);
@@ -39,19 +41,15 @@ angular.module('ngHeath', ['firebase', 'mgcrea.ngStrap'])
           var globalRedirect = options.failureRedirect;
 
           if(userData) {
-            console.log('User is logged in:', userData);
             resolve();
           }
           else {
 
             if(options.failureRedirect && config.failureRedirect) {
-              console.warn('Local override', options.failureRedirect);
-
               redirectTo = config.failureRedirect;
             }
 
             if(options.failureRedirect && !config.failureRedirect ) {
-              console.warn('Global redirect', config.failureRedirect);
               redirectTo = options.failureRedirect;
             }
 
@@ -60,7 +58,6 @@ angular.module('ngHeath', ['firebase', 'mgcrea.ngStrap'])
             }
 
             if(redirectTo) {
-              console.warn('Redirecting to:', redirectTo);
               reject();
               $window.location = redirectTo;
             }
@@ -100,12 +97,10 @@ angular.module('ngHeath', ['firebase', 'mgcrea.ngStrap'])
 
       _this.loginRedirect = function(url) {
         _this.loginRedirectUrl = url;
-        console.log('Login redirect to', url);
       };
 
       _this.logoutRedirect = function(url) {
         _this.logoutRedirectUrl = url;
-        console.log('Logout redirect to', url);
       };
 
       this.authObject = function(scope, scopeKey) {
@@ -137,7 +132,6 @@ angular.module('ngHeath', ['firebase', 'mgcrea.ngStrap'])
           }
 
           if(!keyExistsInScope) {
-            console.warn('Setting new scope key', scopeKey);
             this._authScope[this._authKey] = authObj;
           }
 
@@ -162,7 +156,7 @@ angular.module('ngHeath', ['firebase', 'mgcrea.ngStrap'])
 
           this._userScope = scope;
           this._userKey = scopeKey;
-          this.userObjectActive = true
+          this.userObjectActive = true;
         }
       };
 
@@ -179,10 +173,8 @@ angular.module('ngHeath', ['firebase', 'mgcrea.ngStrap'])
           function(error, userData) {
 
             if (error) {
-              console.log("Error creating user:", error);
               cb("Error creating user: " + error, userData);
             } else {
-              console.log("Successfully created user account with uid:", userData.uid);
               cb(null, userData);
             }
 
@@ -222,7 +214,7 @@ angular.module('ngHeath', ['firebase', 'mgcrea.ngStrap'])
                 if(_this.userObjectActive) {
                   scopeUserObject = user.auth;
                   _this._authScope.$apply();
-                  console.warn('Login successful', user.auth);
+
                   $window.location = _this.loginRedirectUrl;
                 }
 
